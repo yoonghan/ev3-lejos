@@ -67,25 +67,18 @@ git_lego mmpkl05$ sbt about
 1. Open console/command line and go to phase1/roller project.
 2. Run
 ```
-cd phase1/roller
-sbt clean eclipse
-sbt publish
-```
-3. Run
-```
-cd ../../phase1/roller_test
+cd phase1
 sbt clean eclipse
 ```
-4. Boot eclipse and import via File->Import->Existing Project into Workspace. Choose both project one after the other into eclipse workspace.
-5. Right-click on each project, select Properties, choose "Scala Compiler", check use "Project Settings" and set "Scala Installation" as "2.11".
-6. Right-click on roller project, and select Lejos EV3 Project -> Convert to Lejos EV3 project.
-7. Right-click on roller-builder project, select Properties, choose "Java Build Path", click "Project" tab and add roller project. Click "Order and Export" tab, move roller to the Top and below roller-builder projects.
+3. Boot eclipse and import via File->Import->Existing Project into Workspace. Choose both project one after the other into eclipse workspace.
+4. Right-click on each project, select Properties, choose "Scala Compiler", check use "Project Settings" and set "Scala Installation" as "2.11".
+5. Right-click on roller-lego project, and select Lejos EV3 Project -> Convert to Lejos EV3 project.
 
 ## Test installation
 1. Expand roller-builder
 2. Run com.walcron.lego.test.RoverRollerSpec and com.walcron.lego.test.UtilSpec, see if both are running fine. These are software tests.
 3. Once both are ok, it's time for real server test.
-4. Firstly, expand roller and change src/main/resources/config.properties file to the correct ip. NOTE: This is only for wireless, need to find ways to connect via USB.
+4. Firstly, expand roller-lego project and change src/main/resources/config.properties file to the correct ip. NOTE: This is only for wireless, need to find ways to connect via USB.
 5. Epand roller-builder and right-click on src/test/scala...TemporaryServer.java -> Run As -> Scala Application
 ```
 TO STOP SERVER: Use Ctrl-C
@@ -97,7 +90,7 @@ INFO: [HttpServer] Started.
 ->A
 ->W
 ```
-6. Expand roller project and right-click on src/main/java...MainApplication.java -> Run As -> LeJOS Ev3 program. It should display
+6. Expand roller-lego project and right-click on src/main/java...MainApplication.java -> Run As -> LeJOS Ev3 program. It should display
 ```
 Library on classpath: /Users/mmpkl05/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.8.jar
 Library on classpath: /Users/mmpkl05/.ivy2/cache/com.typesafe/config/bundles/config-1.2.1.jar
