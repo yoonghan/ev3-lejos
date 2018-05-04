@@ -3,6 +3,7 @@ This is a project sharing all Ev3 Lego build using java/scala. Project are subdi
 
 # More Info
 Look into each folders for more info
+* Protoype - Basic test, include pure java, server socket and bluetooth connection
 * Phase 1 - Hardware setup with Lejos
 
 If there are more details needed, please visit [Walcron](https://www.walcron.com), email contact is there.

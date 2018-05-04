@@ -21,3 +21,9 @@ classpath=${LEJOS_HOME}/lib/ev3classes.jar:${LEJOS_HOME}/lib/dbusjava.jar:${LEJO
 
 # Run
 1. Find src/main/java/*/MainApplication.java, right-click on the file and select Run->Lejos EV3 Program
+
+
+#PORTS
+PORT A = Large Motor
+PORT B = Large Motor
+PORT 1 = Touch Sensor
