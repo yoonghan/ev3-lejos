@@ -61,7 +61,7 @@ git_lego mmpkl05$ sbt about
 1. Need 2 Large motors
 2. Need a touch sensor
 3. Wireless adapter, if not possible, need to find the IPAddress to connect to pc via USB.
-![alt text](https://github.com/yoonghan/ev3-lejos/tree/master/phase1/img/device.jpg)
+![alt text](img/device.jpg?raw=true)
 
 ## Begin run and testing
 1. Open console/command line and go to phase1/roller project.
