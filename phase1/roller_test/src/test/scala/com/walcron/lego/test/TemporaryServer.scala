@@ -12,6 +12,7 @@ import org.scalacheck._
 object TemporaryServer {
   def sendRandomSeeds(client:WebsocketClient) {
     val randomMovement = Gen.oneOf('W', 'A', 'S', 'D').sample.get
+    println(s"->${randomMovement}")
     client.sendMessage(randomMovement.toString())	
 	}
   
@@ -22,6 +23,7 @@ object TemporaryServer {
 	
 	def main(args:Array[String]) {
 		println("TO STOP SERVER: Use Ctrl-C");
+		println("Path responses are W=Forward, A=Left, S=Backwards, D=Right");
 		initServer()
 		val client:WebsocketClient = new WebsocketClient(Option(new WebSocketAdapter))
 		

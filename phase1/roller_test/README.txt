@@ -4,7 +4,7 @@
 3. Choose "Scala IDE composite update site" from dropdown menu
 4. Install "ScalaTest for Scala IDE"
 5. Restart eclipse
-6. Change eclipse compilation to Scala 2.11, else the test case will now work.
+6. Change eclipse compilation to Scala 2.11, else the test case will not work.
 7. Right-click on project and select properties
 8. Click Build Path
 9. Click on Project tab
