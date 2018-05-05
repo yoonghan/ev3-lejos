@@ -12,6 +12,10 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
 import com.lightbend.lagom.scaladsl.broker.kafka.LagomKafkaComponents
+import kamon.Kamon
+import kamon.zipkin._
+import kamon.prometheus._
+import scala.util.Random
 
 class RollerLoader extends LagomApplicationLoader {
   override def load(context: LagomApplicationContext): LagomApplication =
@@ -23,6 +27,8 @@ class RollerLoader extends LagomApplicationLoader {
     new RollerApplication(context) with LagomDevModeComponents
 
   override def describeService = Some(readDescriptor[RollerService])
+  
+  Kamon.addReporter(new PrometheusReporter())
 }
 
 abstract class RollerApplication(context: LagomApplicationContext)
@@ -35,7 +41,7 @@ abstract class RollerApplication(context: LagomApplicationContext)
 
   override lazy val lagomServer = serverFor[RollerService](wire[RollerImpl])
 
-  override lazy val jsonSerializerRegistry = RollerRegistry
+  override lazy val jsonSerializerRegistry = RollerSerializerRegistry
 
   persistentEntityRegistry.register(wire[RollerEntity])
 }

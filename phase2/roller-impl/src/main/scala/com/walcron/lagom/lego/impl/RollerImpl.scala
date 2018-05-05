@@ -10,6 +10,7 @@ import com.lightbend.lagom.scaladsl.broker.TopicProducer
 import akka.stream.scaladsl.Source
 import akka.NotUsed
 import scala.concurrent.Future
+import kamon.Kamon
 
 class RollerImpl(
     rollerService: RollerService,

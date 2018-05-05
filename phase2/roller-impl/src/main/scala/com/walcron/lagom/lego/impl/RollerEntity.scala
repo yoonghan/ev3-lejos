@@ -11,8 +11,12 @@ import play.api.libs.json.Json._
 import scala.collection.immutable.Seq
 import com.lightbend.lagom.scaladsl.persistence.AggregateEventShards
 import com.walcron.lagom.lego.api.RollerMovementChanged
+import kamon.Kamon
 
 class RollerEntity extends PersistentEntity {
+  
+  val gadotCounter = Kamon.counter("gadot.counter")
+  val gadotRollerMoveSpan = Kamon.buildSpan("gadot-move-roller").withMetricTag("component", "netty.server")
   
   override type Command = RollerCommand[_]
   override type Event = RollerTimelineEvent
@@ -24,6 +28,8 @@ class RollerEntity extends PersistentEntity {
     case RollerState(_, _) => Actions()
     .onCommand[Roller, String] {
       case (Roller(input), ctx, state) =>
+        gadotRollerMoveSpan.start()
+        gadotCounter.increment()
         val event = RollerMovementAdded(input)
         ctx.thenPersist(event) { _ =>
           ctx.reply(input)
@@ -31,6 +37,8 @@ class RollerEntity extends PersistentEntity {
     }
     .onEvent {
       case (RollerMovementAdded(movement), state) =>
+        val gadotSpan = Kamon.currentSpan()
+        gadotSpan.finish()
         RollerState(movement, LocalDateTime.now().toString)
     }
   }
@@ -65,9 +73,10 @@ object RollerMovementAdded {
   implicit val format: Format[RollerMovementAdded] = Json.format
 }
 
-object RollerRegistry extends JsonSerializerRegistry {
+object RollerSerializerRegistry extends JsonSerializerRegistry {
   override def serializers: Seq[JsonSerializer[_]] = Seq(
     JsonSerializer[Roller],
+    JsonSerializer[RollerState],
     JsonSerializer[RollerMovementAdded],
     JsonSerializer[RollerMovementChanged]
   )
