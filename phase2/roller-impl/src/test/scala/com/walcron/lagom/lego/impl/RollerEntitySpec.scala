@@ -6,8 +6,11 @@ import com.lightbend.lagom.scaladsl.testkit.PersistentEntityTestDriver
 import com.lightbend.lagom.scaladsl.playjson.JsonSerializerRegistry
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import com.walcron.lagom.lego.impl._
+import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
+import com.lightbend.lagom.scaladsl.pubsub.TopicId
+import com.lightbend.lagom.scaladsl.pubsub.PubSubRef
 
-class RollerEntitySpec extends WordSpec with Matchers with BeforeAndAfterAll {
+class RollerEntitySpec extends WordSpec with Matchers  with BeforeAndAfterAll {
   private val system = ActorSystem("RollerEntitySpec",
     JsonSerializerRegistry.actorSystemSetupFor(RollerSerializerRegistry))
 
@@ -16,7 +19,7 @@ class RollerEntitySpec extends WordSpec with Matchers with BeforeAndAfterAll {
   }
   
   private def withTestDriver(block: PersistentEntityTestDriver[RollerCommand[_], RollerTimelineEvent, RollerState] => Unit): Unit = {
-    val driver = new PersistentEntityTestDriver(system, new RollerEntity, "roller")
+    val driver = new PersistentEntityTestDriver(system, new RollerEntity(null), "roller")
     block(driver)
     driver.getAllIssues should have size 0
   }

@@ -13,6 +13,7 @@ public final class MainApplication {
 		TouchSensor1 touchSensor = new TouchSensor1();
 		
 		new ScalaRoverRoller(legoMotorA, legoMotorB, touchSensor, true);
+		System.out.println("READY, Player One!");
 	}
 	
 	public static void main(String args[]) {

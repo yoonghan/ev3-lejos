@@ -11,6 +11,7 @@ class LegoExitButton(stopFunc:()=>Unit) extends Thread {
 	  button.addKeyListener(new KeyListener {
 			override def keyReleased(k:Key) {
 			  stopFunc()
+			  System.exit(0)
 			}
 			
 			override def keyPressed(k:Key) {
@@ -20,7 +21,9 @@ class LegoExitButton(stopFunc:()=>Unit) extends Thread {
   }
   
   override def run() {
-    button.waitForPressAndRelease()
+    println("WAIT")
+    button.waitForPress()
+    println("PRESS")
   }
   
   //Starter

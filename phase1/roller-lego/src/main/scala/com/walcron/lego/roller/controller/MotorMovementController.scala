@@ -48,8 +48,6 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 		leftMotor.rotate(-360);
 		rightMotor.rotate(-360);
 		leftMotor.endSynchronize()
-		leftMotor.waitCompletion()
-		rightMotor.waitCompletion()
 	}
 	
 	def moveForward() {
@@ -57,26 +55,20 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 		leftMotor.rotate(360);
 		rightMotor.rotate(360);
 		leftMotor.endSynchronize()
-		leftMotor.waitCompletion()
-		rightMotor.waitCompletion()
 	}
 	
 	def moveLeft() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(360);
-		rightMotor.rotate(-360);
+		leftMotor.rotate(-360);
+		rightMotor.rotate(360);
 		leftMotor.endSynchronize()
-		leftMotor.waitCompletion()
-		rightMotor.waitCompletion()
 	}
 	
 	def moveRight() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(-360);
-		rightMotor.rotate(360);
+		leftMotor.rotate(360);
+		rightMotor.rotate(-360);
 		leftMotor.endSynchronize()
-		leftMotor.waitCompletion()
-		rightMotor.waitCompletion()
 	}
 	
 	//starter

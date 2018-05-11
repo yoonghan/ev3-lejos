@@ -12,8 +12,17 @@ import scala.collection.immutable.Seq
 import com.lightbend.lagom.scaladsl.persistence.AggregateEventShards
 import com.walcron.lagom.lego.api.RollerMovementChanged
 import kamon.Kamon
+import com.lightbend.lagom.scaladsl.pubsub.TopicId
+import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
 
-class RollerEntity extends PersistentEntity {
+class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
+  
+  private val rollerTopic = {
+    if(Option(pubSubRegistry).isDefined) 
+      Option(pubSubRegistry.refFor(TopicId[String])) 
+    else 
+      Option.empty
+  }
   
   val gadotCounter = Kamon.counter("gadot.counter")
   val gadotRollerMoveSpan = Kamon.buildSpan("gadot-move-roller").withMetricTag("component", "netty.server")
@@ -23,7 +32,7 @@ class RollerEntity extends PersistentEntity {
   override type State = RollerState
 
   override def initialState: RollerState = RollerState("Roller", LocalDateTime.now.toString)
-
+  
   override def behavior: Behavior = {
     case RollerState(_, _) => Actions()
     .onCommand[Roller, String] {
@@ -32,6 +41,9 @@ class RollerEntity extends PersistentEntity {
         gadotCounter.increment()
         val event = RollerMovementAdded(input)
         ctx.thenPersist(event) { _ =>
+          if(rollerTopic.isDefined) {
+            rollerTopic.get.publish(input)
+          }
           ctx.reply(input)
         }
     }

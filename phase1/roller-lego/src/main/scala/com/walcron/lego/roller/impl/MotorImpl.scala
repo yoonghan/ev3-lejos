@@ -1,13 +1,36 @@
 package com.walcron.lego.roller.impl
 
 import lejos.robotics.RegulatedMotor
+import lejos.hardware.port.MotorPort
+import lejos.hardware.motor.EV3LargeRegulatedMotor
 
-trait MotorImpl {
-  def rotate(angle:Int)
-  def startSynchronize()
-	def endSynchronize()
-	def waitCompletion()
-  def getMotor():Option[RegulatedMotor]
-	def synchronizeWith(motors: Array[RegulatedMotor])
-  def close() 
+trait MotorImpl {this:LegoMotorImpl =>
+
+  def rotate(angle: Int) {
+		legoRotate(angle)
+	}
+	
+	def getMotor():Option[RegulatedMotor] = {
+	  Option(legoGetMotor())
+	}
+	
+	def synchronizeWith(motors: Array[RegulatedMotor]) {
+	  legoSynchronizeWith(motors)
+	}
+	
+	def startSynchronize() {
+	  legoStartSynchronize()
+	}
+	
+	def endSynchronize() {
+	  legoEndSynchronize()
+	}
+	
+	def waitCompletion() {
+	  legoWaitCompletion()
+	}
+	
+	def close() {
+	  legoClose()
+	}
 }

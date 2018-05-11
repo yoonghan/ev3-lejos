@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Roller Mover</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style>
+    body {
+      min-width: 500px;
+      background-color: #F48FB1;
+      color: #0D47A1;
+    }
+    table {
+      display: table;
+      float: left;
+    }
+    tr {
+      display: table-row
+    }
+    td, th {
+      display: table-cell;
+      padding: 10px;
+    }
+    .btn-nothing {
+      width: 40px;
+      height: 40px;
+      border: 2px solid lightsteelblue;
+      border-radius: 20px;
+      margin: auto;
+    }
+    .roller-descriptor {
+      float: right;
+      left: 0;
+      text-align: right;
+      padding-right: 30%;
+    }
+    #roller-status {
+      margin-top: 50px;
+    }
+    hr {
+      border-top: 3px solid #3f87a6;
+      width: 100%;
+      left: 0;
+    }
+  </style>
+</head>
+    <body class="container">
+      <h2>Optimus Prime's Roller Controller</h2>
+      <hr/>
+      <div class="alert alert-success" role="alert" id="status-connected">
+        Connected
+      </div>
+      <div class="alert alert-danger" role="alert"id="status-fail">
+        Connection Failed
+      </div>
+      <div class="alert alert-dark" role="alert" id="status-connecting">
+        Connecting
+      </div>
+      <div>
+        <table>
+          <tr>
+            <td></td>
+            <td><button class="btn btn-primary" type="submit" id="btnForward"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></button></td>
+            <td></td>
+          <tr>
+          <tr>
+            <td><button class="btn btn-primary" type="submit" id="btnLeft"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button></td>
+            <td><div class="btn-nothing"></div></td>
+            <td><button class="btn btn-primary" type="submit" id="btnRight"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button></td>
+        </table>
+        <div class="roller-descriptor">
+          <h3>Status:</h3>
+          <span id="roller-status"></span>
+        </div>
+      </div>
+    </body>
+    <script>
+    (function(){
+      function sendData(direction) {
+        return function() {
+          if(ws.readyState === ws.CLOSED) {
+            changeLabel("E");
+            ws = new WebSocket(conn);
+          }
+          else if(ws.readyState !== ws.CONNECTING){
+            ws.send(direction);
+          }
+          else {
+            changeLabel("C");
+          }
+        }
+      };
+
+      const movementStatus = document.getElementById('roller-status');
+      const messages = document.getElementsByClassName('alert');
+      const forwardFunc = sendData("W");
+      const leftFunc = sendData("A");
+      const rightFunc = sendData("D");
+
+      const conn = 'ws://localhost:9000/stream';
+      const conn_in = 'ws://localhost:9000/stream/register';
+      var ws = new WebSocket(conn);
+      var ws_in = new WebSocket(conn_in);
+      ws.onclose = function() {
+        changeLabel("E");
+      };
+      ws.onopen = function() {
+        changeLabel("S");
+      };
+      ws_in.onmessage = function (event) {
+        switch (event.data) {
+          case "A":
+            movementStatus.innerHTML="Moving Left";
+            break;
+          case "D":
+            movementStatus.innerHTML="Moving Right";
+            break;
+          case "W":
+            movementStatus.innerHTML="Moving Forward";
+            break;
+          case "S":
+            movementStatus.innerHTML="Moving Backwards";
+            break;
+          case "C":
+            movementStatus.innerHTML="Crash";
+            break;
+          default:
+            movementStatus.innerHTML="What's with (" + event.data + ")";
+        }
+      }
+
+      function changeLabel(showCase) {
+        for (var message of messages) {
+          message.style.display = 'none';
+        }
+        switch (showCase) {
+          case "C":
+            document.getElementById('status-connecting').style.display = 'block';
+            break;
+          case "S":
+            document.getElementById('status-connected').style.display = 'block';
+            break;
+          case "E":
+            document.getElementById('status-fail').style.display = 'block';
+            break;
+        }
+      };
+
+      function addKeyListener() {
+        window.addEventListener("keydown", function (event) {
+          if (event.defaultPrevented) {
+            return;
+          }
+
+          switch (event.key) {
+            case "ArrowUp":
+              forwardFunc();
+              break;
+            case "ArrowLeft":
+              leftFunc();
+              break;
+            case "ArrowRight":
+              rightFunc();
+              break;
+            default:
+              return;
+          }
+
+          event.preventDefault();
+        }, true);
+      };
+
+      function addButtonListener() {
+        document.getElementById('btnForward').addEventListener('click', forwardFunc);
+        document.getElementById('btnLeft').addEventListener('click', leftFunc);
+        document.getElementById('btnRight').addEventListener('click', rightFunc);
+      };
+
+      addButtonListener();
+      addKeyListener();
+      changeLabel("C");
+    })()
+    </script>
+</html>

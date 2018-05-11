@@ -11,15 +11,26 @@ import akka.stream.scaladsl.Source
 import akka.NotUsed
 import scala.concurrent.Future
 import kamon.Kamon
+import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
+import com.lightbend.lagom.scaladsl.pubsub.TopicId
+import akka.stream.Materializer
 
 class RollerImpl(
     rollerService: RollerService,
+    pubSub: PubSubRegistry,
     persistentEntityRegistry: PersistentEntityRegistry
     ) extends RollerService {
   
-  def stream(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
+  val rollerTopic = pubSub.refFor(TopicId[String])
+  
+  def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
     source =>
-    Future.successful(source.mapAsync(3)(rollerService.moveCommand().invoke(_)))
+      Future.successful(source.mapAsync(3)(rollerService.moveCommand().invoke(_)))
+  }
+  
+  def streamOut(): ServiceCall[NotUsed, Source[String, NotUsed]] = {
+    source =>
+      Future.successful(rollerTopic.subscriber)
   }
   
   def moveCommand(): ServiceCall[String, String] = ServiceCall { move =>

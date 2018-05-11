@@ -4,10 +4,9 @@ import com.neovisionaries.ws.client.WebSocketAdapter
 import com.walcron.lego.roller.util.Const
 import com.neovisionaries.ws.client.WebSocketFactory
 
-class WebsocketClient(val adapterReceiver:Option[WebSocketAdapter]) {
-
+class WebsocketClient(val adapterReceiver:Option[WebSocketAdapter], val uri:String) {
+ 
   private def init() = {
-    val uri = Const.CONNECTION_URI
     val webSocket = new WebSocketFactory().createSocket(uri)
     if(adapterReceiver.isDefined) {
       webSocket.addListener(adapterReceiver.get)

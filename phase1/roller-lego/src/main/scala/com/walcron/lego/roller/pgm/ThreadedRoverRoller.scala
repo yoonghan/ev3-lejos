@@ -9,6 +9,8 @@ import akka.actor.SupervisorStrategy._
 import com.walcron.lego.roller.impl.TouchSensorImpl
 import com.walcron.lego.roller.controller.ThreadedReactSensor
 import akka.actor.Terminated
+import com.walcron.lego.roller.connector.WebsocketClient
+import com.walcron.lego.roller.util.Const
 
 /**
  * Expected button is already bind, the listener behind just waits for the signal.
@@ -26,8 +28,15 @@ class ThreadedRoverRoller(activateBtn:Boolean, motorController:MotorMovementCont
       new RoverRoller(activateBtn, hardButtonActor, sensorButtonActor)
     }
     case Terminated(who) => {
+      val conn = new WebsocketClient(Option.empty, Const.CONNECTION_URI_SEND)
+      conn.sendMessage("C")
+      conn.disconnect()
       self ! Go
     }
+  }
+  
+  override def postStop():Unit = {
+    println("END")
   }
 }
 

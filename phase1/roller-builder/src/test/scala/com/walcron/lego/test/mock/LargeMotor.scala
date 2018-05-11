@@ -2,50 +2,44 @@ package com.walcron.lego.test.mock
 
 import com.walcron.lego.roller.impl.MotorImpl
 import lejos.robotics.RegulatedMotor
+import com.walcron.lego.roller.impl.LegoMotorImpl
 
-class MockLargeMotorA extends MotorImpl {
-  override def rotate(angle:Int) {
-		MockResult.motorResultA = angle
-	}
+trait MockLegoMotor extends LegoMotorImpl {
   
-  def getMotor():Option[RegulatedMotor] = {Option.empty}
-	
-	def synchronizeWith(motors: Array[RegulatedMotor]) {}
-	
-	def startSynchronize() {
+	def legoSynchronizeWith(motors: Array[RegulatedMotor]) {
+	  
 	}
 	
-	def endSynchronize() {
+	def legoStartSynchronize() {
+	  
 	}
 	
-	def waitCompletion() {
+	def legoEndSynchronize() {
+	  
 	}
 	
-  def close() {
-    
+	def legoWaitCompletion() {
+	  
+	}
+	
+	def legoClose() {
+	  
+	}
+	
+  def legoGetMotor():RegulatedMotor = {
+    null
   }
 }
 
-class MockLargeMotorB extends MotorImpl {
-  override def rotate(angle:Int) {
-		MockResult.motorResultB = angle
-	}
-  
-  def getMotor():Option[RegulatedMotor] = {Option.empty}
-	
-	def synchronizeWith(motors: Array[RegulatedMotor]) {}
-	
-	def startSynchronize() {
-	}
-	
-	def endSynchronize() {
-	}
-	
-	def waitCompletion() {
-	}
-  
-  def close() {
-    
+class MockLargeMotorA extends MotorImpl with MockLegoMotor {
+  def legoRotate(angle: Int) {
+    MockResult.motorResultA = angle
+  }
+}
+
+class MockLargeMotorB extends MotorImpl with MockLegoMotor {
+  def legoRotate(angle: Int) {
+    MockResult.motorResultB = angle
   }
 }
 

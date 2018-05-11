@@ -16,6 +16,7 @@ import kamon.Kamon
 import kamon.zipkin._
 import kamon.prometheus._
 import scala.util.Random
+import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 
 class RollerLoader extends LagomApplicationLoader {
   override def load(context: LagomApplicationContext): LagomApplication =
@@ -35,6 +36,7 @@ abstract class RollerApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with CassandraPersistenceComponents
     with LagomKafkaComponents
+    with PubSubComponents
     with AhcWSComponents {
   
   lazy val rollerService = serviceClient.implement[RollerService]

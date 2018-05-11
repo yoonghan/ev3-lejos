@@ -10,6 +10,8 @@ import com.walcron.lego.test.mock.MockLargeMotorB
 import com.walcron.lego.test.mock.MockResult
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.walcron.lego.test.mock.TouchSensor
+import com.walcron.lego.roller.util.Const
+import com.neovisionaries.ws.client.WebSocket
 
 class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   
@@ -25,7 +27,7 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
   
   def initClient:WebsocketClient = {
-    new WebsocketClient(Option(new WebSocketAdapter()));
+    new WebsocketClient(Option(new WebSocketAdapter()), Const.CONNECTION_URI_SEND);
   }
   
   def initRoverRoller:ScalaRoverRoller = {
@@ -36,14 +38,14 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
   
   def delay() {
-		Thread.sleep(500)
+		Thread.sleep(800)
 	}
   
   def delayVeryLong() {
 		Thread.sleep(2000)
 	}
   
-  def rollerMovement(roverRoller:ScalaRoverRoller, client:WebsocketClient, server:GrizzlyWebsocketServer) {
+  def rollerMovement(client:WebsocketClient) {
     "For input of W it" should "move forward" in {
       client.sendMessage("W")
       delay
@@ -59,14 +61,14 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     "For input of A it" should "move left" in {
       client.sendMessage("A")
       delay
-      MockResult.motorResultA should be (360)
-      MockResult.motorResultB should be (-360)
+      MockResult.motorResultA should be (-360)
+      MockResult.motorResultB should be (360)
     }
     "For input of D it" should "move right" in {
       client.sendMessage("D")
       delay
-      MockResult.motorResultA should be (-360)
-      MockResult.motorResultB should be (360)
+      MockResult.motorResultA should be (360)
+      MockResult.motorResultB should be (-360)
     }
     "For input of X it" should "do nothing" in {
       client.sendMessage("X")
@@ -89,5 +91,5 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val server = initServer
   val client = initClient
   val rover = initRoverRoller
-  it should behave like rollerMovement(rover, client, server)
+  it should behave like rollerMovement(client)
 }

@@ -7,6 +7,10 @@ import java.util.Collection
 import scala.collection.JavaConversions._
 import org.glassfish.grizzly.websockets.WebSocketEngine
 import com.walcron.lego.roller.util.Const
+import org.glassfish.grizzly.websockets.WebSocket
+import org.glassfish.grizzly.websockets.WebSocketApplication
+import com.walcron.lego.roller.connector.WebsocketClient
+import com.neovisionaries.ws.client.WebSocketAdapter
 
 class GrizzlyWebsocketServer {
   private val server:HttpServer = HttpServer.createSimpleServer(null)
@@ -14,7 +18,28 @@ class GrizzlyWebsocketServer {
   def init() {
     val addon = new WebSocketAddOn()
     server.getListeners.foreach(_.registerAddOn(addon))
-    WebSocketEngine.getEngine.register("", Const.API_PATH, new WebSocketApp)
+    WebSocketEngine.getEngine.register("", Const.API_PATH, new WebSocketApplication {
+      override def onConnect(socket:WebSocket) {
+    	  super.onConnect(socket)
+    	}
+    	
+    	override def onMessage(socket:WebSocket, data:String) {
+        val client = new WebsocketClient(Option(new WebSocketAdapter()), Const.CONNECTION_URI_RECEIVE);
+        client.sendMessage(data)
+        client.disconnect()
+    	}
+      
+    })
+    WebSocketEngine.getEngine.register("", Const.REGISTER_API_PATH, new WebSocketApplication {
+
+    	override def onConnect(socket:WebSocket) {
+    		super.onConnect(socket)
+    	}
+    	
+    	override def onMessage(socket:WebSocket, data:String) {
+    		socket.broadcast(getWebSockets(), data);
+    	}
+    })
   }
 	
   def start() {
