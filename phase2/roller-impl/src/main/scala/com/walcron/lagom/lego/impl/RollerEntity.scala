@@ -14,8 +14,13 @@ import com.walcron.lagom.lego.api.RollerMovementChanged
 import kamon.Kamon
 import com.lightbend.lagom.scaladsl.pubsub.TopicId
 import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
+import org.slf4j.LoggerFactory
+import org.slf4j.MarkerFactory
 
 class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
+  
+  val logger = LoggerFactory.getLogger(classOf[RollerEntity])
+  val marker = MarkerFactory.getMarker("Roller Implementation")
   
   private val rollerTopic = {
     if(Option(pubSubRegistry).isDefined) 
@@ -25,7 +30,6 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   }
   
   val gadotCounter = Kamon.counter("gadot.counter")
-  val gadotRollerMoveSpan = Kamon.buildSpan("gadot-move-roller").withMetricTag("component", "netty.server")
   
   override type Command = RollerCommand[_]
   override type Event = RollerTimelineEvent
@@ -37,8 +41,8 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
     case RollerState(_, _) => Actions()
     .onCommand[Roller, String] {
       case (Roller(input), ctx, state) =>
-        gadotRollerMoveSpan.start()
         gadotCounter.increment()
+        logger.info(marker, "command")
         val event = RollerMovementAdded(input)
         ctx.thenPersist(event) { _ =>
           if(rollerTopic.isDefined) {
@@ -49,8 +53,7 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
     }
     .onEvent {
       case (RollerMovementAdded(movement), state) =>
-        val gadotSpan = Kamon.currentSpan()
-        gadotSpan.finish()
+        logger.info(marker, "event")
         RollerState(movement, LocalDateTime.now().toString)
     }
   }

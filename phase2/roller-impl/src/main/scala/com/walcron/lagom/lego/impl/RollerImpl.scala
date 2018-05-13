@@ -14,6 +14,9 @@ import kamon.Kamon
 import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
 import com.lightbend.lagom.scaladsl.pubsub.TopicId
 import akka.stream.Materializer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.MarkerFactory
 
 class RollerImpl(
     rollerService: RollerService,
@@ -21,19 +24,24 @@ class RollerImpl(
     persistentEntityRegistry: PersistentEntityRegistry
     ) extends RollerService {
   
+  val logger = LoggerFactory.getLogger(classOf[RollerImpl])
+  val marker = MarkerFactory.getMarker("Roller Implementation")
+  
   val rollerTopic = pubSub.refFor(TopicId[String])
   
   def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
     source =>
-      Future.successful(source.mapAsync(3)(rollerService.moveCommand().invoke(_)))
+      Future.successful(source.mapAsync(1)(request => rollerService.moveCommand().invoke(request)))
   }
   
   def streamOut(): ServiceCall[NotUsed, Source[String, NotUsed]] = {
     source =>
+      logger.info(marker, "Start output streaming")
       Future.successful(rollerTopic.subscriber)
   }
   
   def moveCommand(): ServiceCall[String, String] = ServiceCall { move =>
+    logger.info(marker, "move:"+move)
     val ref = persistentEntityRegistry.refFor[RollerEntity](move)
     ref.ask(Roller(move))
   }

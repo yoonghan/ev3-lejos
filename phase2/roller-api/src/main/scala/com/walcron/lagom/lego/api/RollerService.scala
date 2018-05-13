@@ -23,8 +23,8 @@ trait RollerService extends Service {
     named("roller-lagom")
       .withCalls(
         pathCall("/api/roller/move", moveCommand _),
-        namedCall("stream", streamIn _),
-        namedCall("stream/register", streamOut _)
+        namedCall("streamin", streamIn),
+        namedCall("streamout/register", streamOut _)
       )
       .withTopics(
         topic(RollerService.topicName, rollerMoveTopic)
