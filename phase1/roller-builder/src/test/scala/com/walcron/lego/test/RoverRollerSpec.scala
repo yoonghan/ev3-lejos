@@ -17,7 +17,7 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   
   override def afterAll(): Unit = {
     client.disconnect()
-    server.shutdown()
+    //server.shutdown()
   }
   
   def initServer:GrizzlyWebsocketServer = {
@@ -88,7 +88,7 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
   
   //Starter
-  val server = initServer
+  //val server = initServer
   val client = initClient
   val rover = initRoverRoller
   it should behave like rollerMovement(client)

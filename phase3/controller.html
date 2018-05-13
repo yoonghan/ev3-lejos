@@ -98,8 +98,9 @@
       const leftFunc = sendData("A");
       const rightFunc = sendData("D");
 
-      const conn = 'ws://localhost:9000/stream';
-      const conn_in = 'ws://localhost:9000/stream/register';
+      const uri = 'ws://localhost:9000';
+      const conn = uri + '/streamin';
+      const conn_in = uri + '/streamout/register';
       var ws = new WebSocket(conn);
       var ws_in = new WebSocket(conn_in);
       ws.onclose = function() {
@@ -107,6 +108,9 @@
       };
       ws.onopen = function() {
         changeLabel("S");
+      };
+      ws.onerror = function(error) {
+        console.log(error);
       };
       ws_in.onmessage = function (event) {
         switch (event.data) {
