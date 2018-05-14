@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
 
 class RollerImpl(
-    rollerService: RollerService,
     pubSub: PubSubRegistry,
     persistentEntityRegistry: PersistentEntityRegistry
     ) extends RollerService {
@@ -31,7 +30,7 @@ class RollerImpl(
   
   def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
     source =>
-      Future.successful(source.mapAsync(1)(request => rollerService.moveCommand().invoke(request)))
+      Future.successful(source.mapAsync(1)(direction => moveCall(direction)))
   }
   
   def streamOut(): ServiceCall[NotUsed, Source[String, NotUsed]] = {
@@ -40,10 +39,14 @@ class RollerImpl(
       Future.successful(rollerTopic.subscriber)
   }
   
-  def moveCommand(): ServiceCall[String, String] = ServiceCall { move =>
-    logger.info(marker, "move:"+move)
-    val ref = persistentEntityRegistry.refFor[RollerEntity](move)
-    ref.ask(Roller(move))
+  def moveCommand(): ServiceCall[String, String] = ServiceCall { direction =>
+    moveCall(direction)
+  }
+  
+  def moveCall(direction:String) = {
+    logger.info(marker, "move:"+direction)
+    val ref = persistentEntityRegistry.refFor[RollerEntity](direction)
+    ref.ask(Roller(direction))
   }
   
   private def convertEvent(rollerTimelineEvent: EventStreamElement[RollerTimelineEvent]): RollerMovementChanged = {

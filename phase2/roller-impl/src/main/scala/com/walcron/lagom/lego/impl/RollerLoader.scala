@@ -39,10 +39,8 @@ abstract class RollerApplication(context: LagomApplicationContext)
     with PubSubComponents
     with AhcWSComponents {
   
-  lazy val rollerService = serviceClient.implement[RollerService]
-
   override lazy val lagomServer = serverFor[RollerService](wire[RollerImpl])
-
+  
   override lazy val jsonSerializerRegistry = RollerSerializerRegistry
 
   persistentEntityRegistry.register(wire[RollerEntity])
