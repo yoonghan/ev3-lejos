@@ -102,9 +102,9 @@
       const rightFunc = sendData("D");
 
       const uri = 'ws://localhost:9000';
-      const uri1 = 'ws://localhost:9001';
-      const conn = uri + '/streamin';
-      const conn_in = uri1 + '/streamout/register';
+      const uri1 = 'ws://localhost:9000';
+      const conn = uri + '/stream/in';
+      const conn_in = uri1 + '/stream/register';
       var ws_in = new WebSocket(conn_in);
       var ws = new WebSocket(conn);
       ws.onclose = function() {

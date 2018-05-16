@@ -24,7 +24,7 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   
   private val rollerTopic = {
     if(Option(pubSubRegistry).isDefined) 
-      Option(pubSubRegistry.refFor(TopicId[String])) 
+      Option(pubSubRegistry.refFor(TopicId[String]("1"))) 
     else 
       Option.empty
   }

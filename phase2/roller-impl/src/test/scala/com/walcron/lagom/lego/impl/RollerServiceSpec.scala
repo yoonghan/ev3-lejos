@@ -21,7 +21,7 @@ class RollerServiceSpec extends AsyncWordSpec with Matchers with BeforeAndAfterA
   "roller service" should {
 
     "say W" in {
-      client.moveCommand().invoke("W").map { answer =>
+      client.moveCommand("1").invoke("W").map { answer =>
         answer should ===("W")
       }
     }

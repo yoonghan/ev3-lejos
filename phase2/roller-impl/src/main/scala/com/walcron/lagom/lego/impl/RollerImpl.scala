@@ -26,12 +26,12 @@ class RollerImpl(
   val logger = LoggerFactory.getLogger(classOf[RollerImpl])
   val marker = MarkerFactory.getMarker("Roller Implementation")
   
-  val rollerTopic = pubSub.refFor(TopicId[String])
+  val rollerTopic = pubSub.refFor(TopicId[String]("1"))
   
   def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
     source =>
       logger.info(marker, "Start input streaming")
-      Future.successful(source.mapAsync(1)(direction => moveCall(direction)))
+      Future.successful(source.mapAsync(1)(direction => moveCall("1", direction)))
   }
   
   def streamOut(): ServiceCall[NotUsed, Source[String, NotUsed]] = {
@@ -40,13 +40,13 @@ class RollerImpl(
       Future.successful(rollerTopic.subscriber)
   }
   
-  def moveCommand(): ServiceCall[String, String] = ServiceCall { direction =>
-    moveCall(direction)
+  def moveCommand(id:String): ServiceCall[String, String] = ServiceCall { direction =>
+    moveCall(id, direction)
   }
   
-  def moveCall(direction:String) = {
-    logger.info(marker, "move:"+direction)
-    val ref = persistentEntityRegistry.refFor[RollerEntity](direction)
+  def moveCall(id:String, direction:String) = {
+    logger.info(marker, s"id:$id, move:$direction")
+    val ref = persistentEntityRegistry.refFor[RollerEntity](id)
     ref.ask(Roller(direction))
   }
   
