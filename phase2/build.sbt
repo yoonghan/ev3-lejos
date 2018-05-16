@@ -10,6 +10,8 @@ lagomKafkaAddress in ThisBuild := "localhost:9092"
 lagomCassandraEnabled in ThisBuild := false
 lagomUnmanagedServices in ThisBuild := Map("cas_native" -> "http://localhost:9042")
 
+lagomServicesPortRange in ThisBuild := PortRange(42000, 45000)
+
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % Test
 val kamonCore = "io.kamon" %% "kamon-core" % "1.1.0"

@@ -30,6 +30,7 @@ class RollerImpl(
   
   def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
     source =>
+      logger.info(marker, "Start input streaming")
       Future.successful(source.mapAsync(1)(direction => moveCall(direction)))
   }
   
@@ -56,9 +57,9 @@ class RollerImpl(
   }
   
   def rollerMoveTopic() : Topic[RollerMovementChanged] = 
-    TopicProducer.taggedStreamWithOffset(RollerTimelineEvent.Tag.allTags.toList) {
-      (tag, offset) =>
-        persistentEntityRegistry.eventStream(tag, offset)
+    TopicProducer.singleStreamWithOffset {
+      offset =>
+        persistentEntityRegistry.eventStream(RollerTimelineEvent.Tag, offset)
           .map(ev => (convertEvent(ev), ev.offset))
     }
 }

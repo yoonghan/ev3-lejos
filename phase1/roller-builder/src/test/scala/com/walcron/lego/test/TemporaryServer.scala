@@ -1,6 +1,5 @@
 package com.walcron.lego.test
 
-import scala.util.Random
 import com.walcron.lego.test.server.GrizzlyWebsocketServer
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.walcron.lego.roller.connector.WebsocketClient

@@ -8,8 +8,8 @@
   <style>
     body {
       min-width: 500px;
-      background-color: #F48FB1;
-      color: #0D47A1;
+      margin: 0;
+      padding: 0;
     }
     table {
       display: table;
@@ -38,40 +38,43 @@
     #roller-status {
       margin-top: 50px;
     }
-    hr {
-      border-top: 3px solid #3f87a6;
-      width: 100%;
-      left: 0;
+    h2 {
+      background-color: #563d7c;
+      color: #fff;
+      padding: 20px;
+      margin-top: 0;
+      text-align: center;
     }
   </style>
 </head>
-    <body class="container">
-      <h2>Optimus Prime's Roller Controller</h2>
-      <hr/>
-      <div class="alert alert-success" role="alert" id="status-connected">
-        Connected
-      </div>
-      <div class="alert alert-danger" role="alert"id="status-fail">
-        Connection Failed
-      </div>
-      <div class="alert alert-dark" role="alert" id="status-connecting">
-        Connecting
-      </div>
-      <div>
-        <table>
-          <tr>
-            <td></td>
-            <td><button class="btn btn-primary" type="submit" id="btnForward"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></button></td>
-            <td></td>
-          <tr>
-          <tr>
-            <td><button class="btn btn-primary" type="submit" id="btnLeft"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button></td>
-            <td><div class="btn-nothing"></div></td>
-            <td><button class="btn btn-primary" type="submit" id="btnRight"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button></td>
-        </table>
-        <div class="roller-descriptor">
-          <h3>Status:</h3>
-          <span id="roller-status"></span>
+    <body>
+      <header><h2>Optimus Prime's Roller Controller</h2></header>
+      <div class="container">
+        <div class="alert alert-success" role="alert" id="status-connected">
+          Connected
+        </div>
+        <div class="alert alert-danger" role="alert"id="status-fail">
+          Connection Failed
+        </div>
+        <div class="alert alert-info" role="alert" id="status-connecting">
+          Connecting
+        </div>
+        <div>
+          <table>
+            <tr>
+              <td></td>
+              <td><button class="btn btn-primary" type="submit" id="btnForward"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></button></td>
+              <td></td>
+            <tr>
+            <tr>
+              <td><button class="btn btn-primary" type="submit" id="btnLeft"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button></td>
+              <td><div class="btn-nothing"></div></td>
+              <td><button class="btn btn-primary" type="submit" id="btnRight"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button></td>
+          </table>
+          <div class="roller-descriptor">
+            <h3>Status:</h3>
+            <span id="roller-status"></span>
+          </div>
         </div>
       </div>
     </body>
@@ -99,10 +102,11 @@
       const rightFunc = sendData("D");
 
       const uri = 'ws://localhost:9000';
+      const uri1 = 'ws://localhost:9001';
       const conn = uri + '/streamin';
-      const conn_in = uri + '/streamout/register';
-      var ws = new WebSocket(conn);
+      const conn_in = uri1 + '/streamout/register';
       var ws_in = new WebSocket(conn_in);
+      var ws = new WebSocket(conn);
       ws.onclose = function() {
         changeLabel("E");
       };

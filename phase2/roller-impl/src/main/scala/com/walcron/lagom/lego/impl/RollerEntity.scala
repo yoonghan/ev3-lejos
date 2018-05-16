@@ -42,7 +42,7 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
     .onCommand[Roller, String] {
       case (Roller(input), ctx, state) =>
         gadotCounter.increment()
-        logger.info(marker, "command")
+        logger.info(marker, "command:" + input)
         val event = RollerMovementAdded(input)
         ctx.thenPersist(event) { _ =>
           if(rollerTopic.isDefined) {
@@ -53,7 +53,7 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
     }
     .onEvent {
       case (RollerMovementAdded(movement), state) =>
-        logger.info(marker, "event")
+        logger.info(marker, "event:" + movement)
         RollerState(movement, LocalDateTime.now().toString)
     }
   }
@@ -74,12 +74,11 @@ object RollerState {
 }
 
 sealed trait RollerTimelineEvent extends AggregateEvent[RollerTimelineEvent] {
-  override def aggregateTag: AggregateEventShards[RollerTimelineEvent] = RollerTimelineEvent.Tag
+  override def aggregateTag = RollerTimelineEvent.Tag
 }
 
 object RollerTimelineEvent {
-  val NumShards = 3
-  val Tag = AggregateEventTag.sharded[RollerTimelineEvent](NumShards)
+  val Tag = AggregateEventTag[RollerTimelineEvent]
 }
 
 case class RollerMovementAdded(message: String) extends RollerTimelineEvent
