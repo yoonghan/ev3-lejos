@@ -46,29 +46,32 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 	}
   
   def rollerMovement(client:WebsocketClient) {
+    
+    val expectedRotation = 720
+    
     "For input of W it" should "move forward" in {
       client.sendMessage("W")
       delay
-      MockResult.motorResultA should be (360)
-      MockResult.motorResultB should be (360)
+      MockResult.motorResultA should be (expectedRotation)
+      MockResult.motorResultB should be (expectedRotation)
     }
     "For input of S it" should "move backward" in {
       client.sendMessage("S")
       delay
-      MockResult.motorResultA should be (-360)
-      MockResult.motorResultB should be (-360)
+      MockResult.motorResultA should be (-(expectedRotation/2))
+      MockResult.motorResultB should be (-(expectedRotation/2))
     }
     "For input of A it" should "move left" in {
       client.sendMessage("A")
       delay
-      MockResult.motorResultA should be (-360)
-      MockResult.motorResultB should be (360)
+      MockResult.motorResultA should be (-expectedRotation)
+      MockResult.motorResultB should be (expectedRotation)
     }
     "For input of D it" should "move right" in {
       client.sendMessage("D")
       delay
-      MockResult.motorResultA should be (360)
-      MockResult.motorResultB should be (-360)
+      MockResult.motorResultA should be (expectedRotation)
+      MockResult.motorResultB should be (-expectedRotation)
     }
     "For input of X it" should "do nothing" in {
       client.sendMessage("X")
@@ -82,8 +85,8 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       delayVeryLong
       client.sendMessage("W")
       delay
-      MockResult.motorResultA should be (360)
-      MockResult.motorResultB should be (360)
+      MockResult.motorResultA should be (expectedRotation)
+      MockResult.motorResultB should be (expectedRotation)
     }
   }
   

@@ -2,7 +2,6 @@ package com.walcron.lagom.lego.impl
 
 import play.api.libs.json.{Format, Json}
 import java.time.LocalDateTime
-import com.walcron.lagom.lego.api.RollerMoveMessage
 import com.lightbend.lagom.scaladsl.persistence.{AggregateEvent, AggregateEventTag, PersistentEntity}
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntity.ReplyType
 import com.lightbend.lagom.scaladsl.playjson.{JsonSerializer, JsonSerializerRegistry}
@@ -16,6 +15,7 @@ import com.lightbend.lagom.scaladsl.pubsub.TopicId
 import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
+import com.walcron.lagom.lego.api._
 
 class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   
@@ -24,9 +24,17 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   
   private val rollerTopic = {
     if(Option(pubSubRegistry).isDefined) 
-      Option(pubSubRegistry.refFor(TopicId[String]("1"))) 
+      Option(pubSubRegistry.refFor(TopicId[RollerTopicDirection]("1"))) 
     else 
       Option.empty
+  }
+  
+  private def faceDirection(movement:String, currentDirection:Int):Int = {
+    movement match {
+      case "D" => if(currentDirection + 1 > 7) 0 else currentDirection + 1
+      case "A" => if(currentDirection - 1 < 1) 0 else currentDirection - 1
+      case _ => currentDirection + 0
+    }
   }
   
   val gadotCounter = Kamon.counter("gadot.counter")
@@ -35,26 +43,27 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   override type Event = RollerTimelineEvent
   override type State = RollerState
 
-  override def initialState: RollerState = RollerState("Roller", LocalDateTime.now.toString)
+  override def initialState: RollerState = RollerState("F", 0, LocalDateTime.now.toString)
   
   override def behavior: Behavior = {
-    case RollerState(_, _) => Actions()
+    case RollerState(sMovement, sDirection, sTime) => Actions()
     .onCommand[Roller, String] {
       case (Roller(input), ctx, state) =>
         gadotCounter.increment()
-        logger.info(marker, "command:" + input)
-        val event = RollerMovementAdded(input)
+        logger.info(marker, s"""command: $input, $sDirection""")
+        val event = RollerMovementAdded(input, faceDirection(input, sDirection))
         ctx.thenPersist(event) { _ =>
           if(rollerTopic.isDefined) {
-            rollerTopic.get.publish(input)
+            logger.info(marker, s"""publish: ${event.message}, ${event.direction}""")
+            rollerTopic.get.publish(RollerTopicDirection(event.message, event.direction))
           }
           ctx.reply(input)
         }
     }
     .onEvent {
-      case (RollerMovementAdded(movement), state) =>
-        logger.info(marker, "event:" + movement)
-        RollerState(movement, LocalDateTime.now().toString)
+      case (RollerMovementAdded(movement, direction), state) =>
+        logger.info(marker, s"""event: $movement, $direction""")
+        RollerState(movement, direction, LocalDateTime.now().toString)
     }
   }
 }
@@ -67,21 +76,22 @@ object Roller {
   implicit val format: Format[Roller] = Json.format
 }
 
-case class RollerState(message: String, timestamp: String)
+case class RollerState(message: String, direction:Int, timestamp: String)
 
 object RollerState {
   implicit val format: Format[RollerState] = Json.format
 }
 
 sealed trait RollerTimelineEvent extends AggregateEvent[RollerTimelineEvent] {
-  override def aggregateTag = RollerTimelineEvent.Tag
+  override def aggregateTag: AggregateEventShards[RollerTimelineEvent] = RollerTimelineEvent.Tag
 }
 
 object RollerTimelineEvent {
-  val Tag = AggregateEventTag[RollerTimelineEvent]
+  val NumShards = 3
+  val Tag = AggregateEventTag.sharded[RollerTimelineEvent](NumShards)
 }
 
-case class RollerMovementAdded(message: String) extends RollerTimelineEvent
+case class RollerMovementAdded(message: String, direction: Int) extends RollerTimelineEvent
 
 object RollerMovementAdded {
   implicit val format: Format[RollerMovementAdded] = Json.format
@@ -92,6 +102,7 @@ object RollerSerializerRegistry extends JsonSerializerRegistry {
     JsonSerializer[Roller],
     JsonSerializer[RollerState],
     JsonSerializer[RollerMovementAdded],
-    JsonSerializer[RollerMovementChanged]
+    JsonSerializer[RollerMovementChanged],
+    JsonSerializer[RollerTopicDirection]
   )
 }

@@ -4,6 +4,7 @@ import com.walcron.lego.roller.ScalaRoverRoller;
 import com.walcron.lego.roller.hardware.LegoLargeMotorA;
 import com.walcron.lego.roller.hardware.LegoLargeMotorB;
 import com.walcron.lego.roller.hardware.TouchSensor1;
+import com.walcron.lego.roller.util.Property;
 
 public final class MainApplication {
 	
@@ -13,7 +14,9 @@ public final class MainApplication {
 		TouchSensor1 touchSensor = new TouchSensor1();
 		
 		new ScalaRoverRoller(legoMotorA, legoMotorB, touchSensor, true);
-		System.out.println("READY, Player One!");
+		System.out.println("Connects to:" + Property.getServer());
+		System.out.println("Ready, Player One!");
+		
 	}
 	
 	public static void main(String args[]) {

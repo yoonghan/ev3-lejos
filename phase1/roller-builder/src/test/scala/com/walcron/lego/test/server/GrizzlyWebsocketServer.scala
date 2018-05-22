@@ -11,9 +11,13 @@ import org.glassfish.grizzly.websockets.WebSocket
 import org.glassfish.grizzly.websockets.WebSocketApplication
 import com.walcron.lego.roller.connector.WebsocketClient
 import com.neovisionaries.ws.client.WebSocketAdapter
+import com.google.gson.Gson
+
+case class RollerTopicDirection(message:String, direction:Int)
 
 class GrizzlyWebsocketServer {
   private val server:HttpServer = HttpServer.createSimpleServer(null)
+  val gson = new Gson
   
   def init() {
     val addon = new WebSocketAddOn()
@@ -25,8 +29,13 @@ class GrizzlyWebsocketServer {
     	
     	override def onMessage(socket:WebSocket, data:String) {
         val client = new WebsocketClient(Option(new WebSocketAdapter()), Const.CONNECTION_URI_RECEIVE);
-        client.sendMessage(data)
+        client.sendMessage(changeMessageToJson(data))
         client.disconnect()
+    	}
+    	
+    	def changeMessageToJson(data:String):String = {
+    	  val response = RollerTopicDirection(data, 1)
+        gson.toJson(response)
     	}
       
     })

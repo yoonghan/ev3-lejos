@@ -7,6 +7,7 @@ import com.neovisionaries.ws.client.WebSocketFactory
 class WebsocketClient(val adapterReceiver:Option[WebSocketAdapter], val uri:String) {
  
   private def init() = {
+    println(s"""Connected""")
     val webSocket = new WebSocketFactory().createSocket(uri)
     if(adapterReceiver.isDefined) {
       webSocket.addListener(adapterReceiver.get)

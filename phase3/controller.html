@@ -117,7 +117,8 @@
         console.log(error);
       };
       ws_in.onmessage = function (event) {
-        switch (event.data) {
+        const response = JSON.parse(event.data)
+        switch (response.message) {
           case "A":
             movementStatus.innerHTML="Moving Left";
             break;

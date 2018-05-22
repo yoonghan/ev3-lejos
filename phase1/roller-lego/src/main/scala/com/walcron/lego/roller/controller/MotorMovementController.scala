@@ -7,6 +7,8 @@ import com.walcron.lego.roller.util.Const
 
 class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
   val canUpdate = new AtomicBoolean(true);
+  val fullRotation = 720
+  val halfRotation = 360
   
   def init() {
    if(leftMotor != null && rightMotor !=null) {
@@ -45,29 +47,29 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 	
 	def moveBackward() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(-360);
-		rightMotor.rotate(-360);
+		leftMotor.rotate(-halfRotation);
+		rightMotor.rotate(-halfRotation);
 		leftMotor.endSynchronize()
 	}
 	
 	def moveForward() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(360);
-		rightMotor.rotate(360);
+		leftMotor.rotate(fullRotation);
+		rightMotor.rotate(fullRotation);
 		leftMotor.endSynchronize()
 	}
 	
 	def moveLeft() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(-360);
-		rightMotor.rotate(360);
+		leftMotor.rotate(-fullRotation);
+		rightMotor.rotate(fullRotation);
 		leftMotor.endSynchronize()
 	}
 	
 	def moveRight() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(360);
-		rightMotor.rotate(-360);
+		leftMotor.rotate(fullRotation);
+		rightMotor.rotate(-fullRotation);
 		leftMotor.endSynchronize()
 	}
 	

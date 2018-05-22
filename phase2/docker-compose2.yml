@@ -1,7 +1,7 @@
 version: '3'
 services:
   lagom-with-seed:
-    image: roller-impl:1.0-SNAPSHOT
+    image: 192.168.1.244:5000/roller
     ports:
       - "9000:9000"
       - "9095:9095"
@@ -30,7 +30,7 @@ services:
         max_attempts: 3
         window: 120s
   lagom-with-seed-1:
-    image: roller-impl:1.0-SNAPSHOT
+    image: 192.168.1.244:5000/roller
     ports:
       - "9001:9000"
     environment:

@@ -14,7 +14,7 @@ object RollerService  {
 trait RollerService extends Service {
   
   def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]]
-  def streamOut(): ServiceCall[NotUsed, Source[String, NotUsed]]
+  def streamOut(): ServiceCall[NotUsed, Source[RollerTopicDirection, NotUsed]]
   def moveCommand(id:String): ServiceCall[String, String]
   def rollerMoveTopic() : Topic [RollerMovementChanged]
   
