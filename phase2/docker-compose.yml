@@ -7,6 +7,7 @@ services:
       - "9095:9095"
     environment:
       - DB_HOST_IP=192.168.1.244
+      - APPLICATION_NAME=roller-impl-application
       - BIND_IP=0.0.0.0
       - BIND_PORT=2551
       - KAFKA_HOST_IP_AND_PORT=192.168.1.244:9092
@@ -35,6 +36,7 @@ services:
       - "9001:9000"
     environment:
       - DB_HOST_IP=192.168.1.244
+      - APPLICATION_NAME=roller-impl-application
       - BIND_IP=0.0.0.0
       - BIND_PORT=2552
       - KAFKA_HOST_IP_AND_PORT=192.168.1.244:9092

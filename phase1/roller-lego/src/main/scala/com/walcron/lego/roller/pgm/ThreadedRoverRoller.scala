@@ -20,17 +20,15 @@ class ThreadedRoverRoller(activateBtn:Boolean, motorController:MotorMovementCont
   import ThreadedRoverRoller._
   import context._
 
+  val sensorButtonActor = context.actorOf(ThreadedReactSensor.props(touchSensor), "touchSensorActor")
+  
   def receive = {
     case Go => {
-      val hardButtonActor = context.actorOf(ThreadedMotorController.props(motorController), "motorActor")
-      val sensorButtonActor = context.actorOf(ThreadedReactSensor.props(touchSensor), "touchSensorActor")
-      context.watch(hardButtonActor)
-      new RoverRoller(activateBtn, hardButtonActor, sensorButtonActor)
+      val threadedMotorControllerActor = context.actorOf(ThreadedMotorController.props(motorController), "motorActor")
+      context.watch(threadedMotorControllerActor)
+      new RoverRoller(activateBtn, threadedMotorControllerActor, sensorButtonActor)
     }
     case Terminated(who) => {
-      val conn = new WebsocketClient(Option.empty, Const.CONNECTION_URI_SEND)
-      conn.sendMessage("C")
-      conn.disconnect()
       self ! Go
     }
   }

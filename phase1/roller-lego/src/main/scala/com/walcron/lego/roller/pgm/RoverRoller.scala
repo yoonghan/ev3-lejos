@@ -10,9 +10,9 @@ import com.walcron.lego.roller.impl.TouchSensorImpl
 import com.walcron.lego.roller.controller.ThreadedReactSensor
 import com.walcron.lego.roller.util.Const
 
-class RoverRoller(activateBtn:Boolean, btnProp:ActorRef, sensorProp:ActorRef) {
+class RoverRoller(activateBtn:Boolean, threadedMotorControllerActor:ActorRef, sensorProp:ActorRef) {
   private def initClient(controller: ActorRef):WebsocketClient = {
-    new WebsocketClient(Option(new MovementController(btnProp)), Const.CONNECTION_URI_RECEIVE)
+    new WebsocketClient(Option(new MovementController(threadedMotorControllerActor)), Const.CONNECTION_URI_RECEIVE)
   }
   
   private def touchSensorListener(controller: ActorRef) {
@@ -25,6 +25,6 @@ class RoverRoller(activateBtn:Boolean, btnProp:ActorRef, sensorProp:ActorRef) {
     controller ! EndMove
   }
   
-	val client = initClient(btnProp)
-	touchSensorListener(btnProp)
+	val client = initClient(threadedMotorControllerActor)
+	touchSensorListener(threadedMotorControllerActor)
 }

@@ -27,17 +27,20 @@ class RollerImpl(
   val logger = LoggerFactory.getLogger(classOf[RollerImpl])
   val marker = MarkerFactory.getMarker("Roller Implementation")
   
-  val rollerTopic = pubSub.refFor(TopicId[RollerTopicDirection]("1"))
-  
-  def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
-    source =>
-      logger.info(marker, "Start input streaming")
-      Future.successful(source.mapAsync(1)(direction => moveCall("1", direction)))
+  def showOk():ServiceCall[NotUsed, String] = {
+    input => Future.successful("Ok")
   }
   
-  def streamOut(): ServiceCall[NotUsed, Source[RollerTopicDirection, NotUsed]] = {
+  def streamIn(id:String): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]] = { 
+    source =>
+      logger.info(marker, "Start input streaming")
+      Future.successful(source.mapAsync(1)(direction => moveCall(id, direction)))
+  }
+  
+  def streamOut(id:String): ServiceCall[NotUsed, Source[RollerTopicDirection, NotUsed]] = {
     source =>
       logger.info(marker, "Start output streaming")
+      val rollerTopic = pubSub.refFor(TopicId[RollerTopicDirection](id))
       Future.successful(rollerTopic.subscriber)
   }
   
@@ -48,7 +51,7 @@ class RollerImpl(
   def moveCall(id:String, direction:String) = {
     logger.info(marker, s"id:$id, move:$direction")
     val ref = persistentEntityRegistry.refFor[RollerEntity](id)
-    ref.ask(Roller(direction))
+    ref.ask(Roller(id, direction))
   }
   
   private def convertEvent(rollerTimelineEvent: EventStreamElement[RollerTimelineEvent]): RollerMovementChanged = {

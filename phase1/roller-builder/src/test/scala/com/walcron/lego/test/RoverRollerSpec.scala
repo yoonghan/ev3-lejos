@@ -73,7 +73,13 @@ class RoverRollerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       MockResult.motorResultA should be (expectedRotation)
       MockResult.motorResultB should be (-expectedRotation)
     }
-    "For input of X it" should "do nothing" in {
+    "For input of @ it" should "do nothing" in {
+      client.sendMessage("@")
+      delay
+      MockResult.motorResultA should be (expectedRotation)
+      MockResult.motorResultB should be (-expectedRotation)
+    }
+    "For input of X it" should "reset" in {
       client.sendMessage("X")
       delay
       MockResult.motorResultA should be (0)

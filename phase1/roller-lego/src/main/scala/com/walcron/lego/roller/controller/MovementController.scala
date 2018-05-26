@@ -7,17 +7,26 @@ import com.walcron.lego.roller.util.Const
 import akka.actor.ActorRef
 import com.walcron.lego.roller.controller.ThreadedMotorController._
 import com.google.gson.Gson
+import com.neovisionaries.ws.client.WebSocketFrame
+import com.neovisionaries.ws.client.WebSocketException
 
 case class RollerTopicDirection(message:String, direction:Int)
 
-class MovementController(actor: ActorRef) extends WebSocketAdapter {
+class MovementController(threadedMotorControllerActor: ActorRef) extends WebSocketAdapter {
   val gson = new Gson
   
   override def onTextMessage(ws: WebSocket, json:String) {
     val response = gson.fromJson(json, classOf[RollerTopicDirection])
   	val symbol = response.message.charAt(0);
   	val assumedDirection = charToDirection(symbol);
-  	actor ! MoveAction(assumedDirection)
+  	threadedMotorControllerActor ! MoveAction(assumedDirection)
+  }
+  
+  override def onError(websocket:WebSocket, error:WebSocketException) {
+    println("Reconnect SQL.")
+    websocket.disconnect()
+    threadedMotorControllerActor ! Reconnect
+    super.onError(websocket, error)
   }
   
   def charToDirection(symbol:Char):Directions = {
@@ -26,6 +35,7 @@ class MovementController(actor: ActorRef) extends WebSocketAdapter {
       case 'D' => Const.RIGHT
       case 'S' => Const.BACKWARD
       case 'W' => Const.FORWARD
+      case '@' => Const.NOTHING
       case _ => Const.STOP
     }
   }

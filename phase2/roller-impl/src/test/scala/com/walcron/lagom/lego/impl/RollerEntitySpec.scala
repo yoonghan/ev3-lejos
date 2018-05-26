@@ -27,7 +27,7 @@ class RollerEntitySpec extends WordSpec with Matchers  with BeforeAndAfterAll {
   
   "roller entity" should {
     "say W by default" in withTestDriver { driver =>
-      val outcome = driver.run(Roller("W"))
+      val outcome = driver.run(Roller("1","W"))
       outcome.replies should contain only "W"
     }
   }

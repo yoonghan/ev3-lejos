@@ -13,7 +13,6 @@
     }
     table {
       display: table;
-      float: left;
     }
     tr {
       display: table-row
@@ -30,10 +29,8 @@
       margin: auto;
     }
     .roller-descriptor {
-      float: right;
       left: 0;
       text-align: right;
-      padding-right: 30%;
     }
     #roller-status {
       margin-top: 50px;
@@ -45,6 +42,27 @@
       margin-top: 0;
       text-align: center;
     }
+    .display-content {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+    .roller-direction-arrow {
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-bottom: 40px solid #FF0000;
+      border-top: 0;
+      margin: auto;
+    }
+    @media screen and (max-width: 480px) {
+      .display-content {
+        flex-direction: column;
+      }
+    }
+    h3 {
+      text-align: center;
+    }
   </style>
 </head>
     <body>
@@ -53,13 +71,13 @@
         <div class="alert alert-success" role="alert" id="status-connected">
           Connected
         </div>
-        <div class="alert alert-danger" role="alert"id="status-fail">
+        <div class="alert alert-danger" role="alert" id="status-fail">
           Connection Failed
         </div>
         <div class="alert alert-info" role="alert" id="status-connecting">
           Connecting
         </div>
-        <div>
+        <div class="display-content">
           <table>
             <tr>
               <td></td>
@@ -71,6 +89,10 @@
               <td><div class="btn-nothing"></div></td>
               <td><button class="btn btn-primary" type="submit" id="btnRight"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button></td>
           </table>
+          <div class="roller-direction">
+            <h3>Direction:</h3>
+            <div class="roller-direction-arrow" id="roller-facing"></div>
+          </div>
           <div class="roller-descriptor">
             <h3>Status:</h3>
             <span id="roller-status"></span>
@@ -80,11 +102,13 @@
     </body>
     <script>
     (function(){
-      function sendData(direction) {
+      var ws, ws_in;
+
+      sendData = (direction) => {
         return function() {
           if(ws.readyState === ws.CLOSED) {
             changeLabel("E");
-            ws = new WebSocket(conn);
+            connect();
           }
           else if(ws.readyState !== ws.CONNECTING){
             ws.send(direction);
@@ -95,51 +119,71 @@
         }
       };
 
-      const movementStatus = document.getElementById('roller-status');
-      const messages = document.getElementsByClassName('alert');
-      const forwardFunc = sendData("W");
-      const leftFunc = sendData("A");
-      const rightFunc = sendData("D");
+      connect = () => {
+        ws = new WebSocket(conn);
+        ws_in = new WebSocket(conn_in);
+        var ws_connected = false;
+        var ws_in_connected = false;
 
-      const uri = 'ws://localhost:9000';
-      const uri1 = 'ws://localhost:9000';
-      const conn = uri + '/stream/in';
-      const conn_in = uri1 + '/stream/register';
-      var ws_in = new WebSocket(conn_in);
-      var ws = new WebSocket(conn);
-      ws.onclose = function() {
-        changeLabel("E");
-      };
-      ws.onopen = function() {
-        changeLabel("S");
-      };
-      ws.onerror = function(error) {
-        console.log(error);
-      };
-      ws_in.onmessage = function (event) {
-        const response = JSON.parse(event.data)
-        switch (response.message) {
-          case "A":
-            movementStatus.innerHTML="Moving Left";
-            break;
-          case "D":
-            movementStatus.innerHTML="Moving Right";
-            break;
-          case "W":
-            movementStatus.innerHTML="Moving Forward";
-            break;
-          case "S":
-            movementStatus.innerHTML="Moving Backwards";
-            break;
-          case "C":
-            movementStatus.innerHTML="Crash";
-            break;
-          default:
-            movementStatus.innerHTML="What's with (" + event.data + ")";
+        ws.onclose = function() {
+          changeLabel("E");
+        };
+
+        ws_in.onopen = function() {
+          ws_in_connected = true;
+          synchronizeStatus();
+        };
+
+        ws.onopen = function() {
+          ws_connected = true;
+          synchronizeStatus();
+        };
+
+        synchronizeStatus = () => {
+          if(ws_in_connected && ws_connected) {
+            changeLabel("S");
+            sendData("@")();
+            ws_in_connected = false;
+            ws_connected = false;
+          }
+        }
+
+        ws.onerror = function(error) {
+          console.log("Not connected");
+          console.dir(error);
+        };
+
+        ws_in.onmessage = function (event) {
+          const response = JSON.parse(event.data)
+          switch (response.message) {
+            case "A":
+              movementStatus.innerHTML="Moving Left";
+              break;
+            case "D":
+              movementStatus.innerHTML="Moving Right";
+              break;
+            case "W":
+              movementStatus.innerHTML="Moving Forward";
+              break;
+            case "S":
+              movementStatus.innerHTML="Moving Backwards";
+              break;
+            case "C":
+              movementStatus.innerHTML="Crash";
+              break;
+            case "@":
+              movementStatus.innerHTML="Synch";
+              break;
+            default:
+              movementStatus.innerHTML="What's with (" + event.data + ")";
+          }
+
+          var degRotate = response.direction * 45;
+          facingArrow.style.transform = 'rotate('+degRotate+'deg)'
         }
       }
 
-      function changeLabel(showCase) {
+      changeLabel = (showCase) => {
         for (var message of messages) {
           message.style.display = 'none';
         }
@@ -156,7 +200,7 @@
         }
       };
 
-      function addKeyListener() {
+      addKeyListener = () => {
         window.addEventListener("keydown", function (event) {
           if (event.defaultPrevented) {
             return;
@@ -180,12 +224,23 @@
         }, true);
       };
 
-      function addButtonListener() {
+      addButtonListener = () => {
         document.getElementById('btnForward').addEventListener('click', forwardFunc);
         document.getElementById('btnLeft').addEventListener('click', leftFunc);
         document.getElementById('btnRight').addEventListener('click', rightFunc);
       };
 
+      const movementStatus = document.getElementById('roller-status');
+      const messages = document.getElementsByClassName('alert');
+      const facingArrow = document.getElementById('roller-facing');
+      const forwardFunc = sendData("W");
+      const leftFunc = sendData("A");
+      const rightFunc = sendData("D");
+      const uri = 'ws://localhost:8000';
+      const uri1 = 'ws://localhost:8000';
+      const conn = uri + '/stream/1/in';
+      const conn_in = uri1 + '/stream/1/register';
+      connect();
       addButtonListener();
       addKeyListener();
       changeLabel("C");

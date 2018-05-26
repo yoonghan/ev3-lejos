@@ -16,7 +16,6 @@ class ThreadedReactSensor(touchSensor:TouchSensorImpl) extends Actor {
     case Listen(execFunc) => {
       touchSensor.waitForTouch()
       execFunc()
-      context.stop(self)
     }
   }
 }

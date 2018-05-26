@@ -17,6 +17,7 @@ public final class MainApplication {
 		System.out.println("Connects to:" + Property.getServer());
 		System.out.println("Ready, Player One!");
 		
+		lejos.hardware.Sound.beep();
 	}
 	
 	public static void main(String args[]) {

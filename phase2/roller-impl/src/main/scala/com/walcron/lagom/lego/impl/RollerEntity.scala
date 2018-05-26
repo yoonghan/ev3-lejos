@@ -22,18 +22,18 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   val logger = LoggerFactory.getLogger(classOf[RollerEntity])
   val marker = MarkerFactory.getMarker("Roller Implementation")
   
-  private val rollerTopic = {
+  private def rollerTopic(id:String) = {
     if(Option(pubSubRegistry).isDefined) 
-      Option(pubSubRegistry.refFor(TopicId[RollerTopicDirection]("1"))) 
+      Option(pubSubRegistry.refFor(TopicId[RollerTopicDirection](id))) 
     else 
       Option.empty
   }
   
   private def faceDirection(movement:String, currentDirection:Int):Int = {
     movement match {
-      case "D" => if(currentDirection + 1 > 7) 0 else currentDirection + 1
-      case "A" => if(currentDirection - 1 < 1) 0 else currentDirection - 1
-      case _ => currentDirection + 0
+      case "D" => if(currentDirection > 6) 0 else currentDirection + 1
+      case "A" => if(currentDirection < 1) 7 else currentDirection - 1
+      case _ => currentDirection
     }
   }
   
@@ -48,14 +48,14 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
   override def behavior: Behavior = {
     case RollerState(sMovement, sDirection, sTime) => Actions()
     .onCommand[Roller, String] {
-      case (Roller(input), ctx, state) =>
+      case (Roller(id, input), ctx, state) =>
         gadotCounter.increment()
         logger.info(marker, s"""command: $input, $sDirection""")
         val event = RollerMovementAdded(input, faceDirection(input, sDirection))
         ctx.thenPersist(event) { _ =>
-          if(rollerTopic.isDefined) {
+          if(rollerTopic(id).isDefined) {
             logger.info(marker, s"""publish: ${event.message}, ${event.direction}""")
-            rollerTopic.get.publish(RollerTopicDirection(event.message, event.direction))
+            rollerTopic(id).get.publish(RollerTopicDirection(event.message, event.direction))
           }
           ctx.reply(input)
         }
@@ -70,7 +70,7 @@ class RollerEntity(pubSubRegistry: PubSubRegistry) extends PersistentEntity {
 
 sealed trait RollerCommand[R] extends ReplyType[R]
 
-case class Roller(move: String) extends RollerCommand[String]
+case class Roller(id:String, move: String) extends RollerCommand[String]
 
 object Roller {
   implicit val format: Format[Roller] = Json.format

@@ -32,17 +32,20 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 	
 	def moveInDirection(direction: Directions) {
 	  direction match {
-	    case Const.BACKWARD => {moveBackward}
-	    case Const.FORWARD => {moveForward}
-	    case Const.LEFT => {moveLeft()}
-	    case Const.RIGHT => {moveRight()}
-	    case _ => {haltMovement()}
+	    case Const.BACKWARD => { moveBackward }
+	    case Const.FORWARD => { moveForward }
+	    case Const.LEFT => { moveLeft() }
+	    case Const.RIGHT => { moveRight() }
+	    case Const.STOP => { haltMovement() }
+	    case _ => return
 	  }
 	}
 	
 	def haltMovement() {
 	  leftMotor.rotate(0);
 		rightMotor.rotate(0);
+		leftMotor.waitCompletion();
+		rightMotor.waitCompletion();
 	}
 	
 	def moveBackward() {

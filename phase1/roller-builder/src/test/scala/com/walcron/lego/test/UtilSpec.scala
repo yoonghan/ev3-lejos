@@ -10,4 +10,9 @@ class UtilSpec extends FlatSpec with Matchers {
     val property = Property
     property.getServer() shouldEqual ("localhost:8080")
   }
+  
+  "A config" should "have id" in {
+    val property = Property
+    property.getId() shouldEqual ("test")
+  }
 }

@@ -13,18 +13,20 @@ object RollerService  {
 
 trait RollerService extends Service {
   
-  def streamIn(): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]]
-  def streamOut(): ServiceCall[NotUsed, Source[RollerTopicDirection, NotUsed]]
+  def streamIn(id:String): ServiceCall[Source[String, NotUsed], Source[String, NotUsed]]
+  def streamOut(id:String): ServiceCall[NotUsed, Source[RollerTopicDirection, NotUsed]]
   def moveCommand(id:String): ServiceCall[String, String]
   def rollerMoveTopic() : Topic [RollerMovementChanged]
+  def showOk(): ServiceCall[NotUsed, String]
   
   override final def descriptor = {
     import Service._
     named("roller-lagom")
       .withCalls(
+        namedCall("/", showOk),
         pathCall("/api/roller/move/:id", moveCommand _),
-        namedCall("stream/in", streamIn _),
-        namedCall("stream/register", streamOut _)
+        pathCall("/stream/:id/in", streamIn _),
+        pathCall("/stream/:id/register", streamOut _)
       )
       .withTopics(
         topic(RollerService.topicName, rollerMoveTopic)
