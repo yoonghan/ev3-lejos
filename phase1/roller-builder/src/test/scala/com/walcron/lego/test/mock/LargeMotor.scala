@@ -32,18 +32,40 @@ trait MockLegoMotor extends LegoMotorImpl {
 }
 
 class MockLargeMotorA extends MotorImpl with MockLegoMotor {
-  def legoRotate(angle: Int) {
+  override def legoRotate(angle: Int) {
     MockResult.motorResultA = angle
+  }
+  
+  override def legoSetSpeed(speed: Int) {
+    MockResult.motorSpeedA = speed
   }
 }
 
 class MockLargeMotorB extends MotorImpl with MockLegoMotor {
-  def legoRotate(angle: Int) {
+  override def legoRotate(angle: Int) {
     MockResult.motorResultB = angle
+  }
+  
+  override def legoSetSpeed(speed: Int) {
+    MockResult.motorSpeedB = speed
+  }
+}
+
+class MockMediumMotorC extends MotorImpl with MockLegoMotor {
+  override def legoRotate(angle: Int) {
+    MockResult.motorResultC = angle
+  }
+  
+  override def legoSetSpeed(speed: Int) {
+    MockResult.motorSpeedC = speed
   }
 }
 
 object MockResult {
   var motorResultA = 0
   var motorResultB = 0
+  var motorResultC = 0
+  var motorSpeedA = 0
+  var motorSpeedB = 0
+  var motorSpeedC = 0
 }

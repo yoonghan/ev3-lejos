@@ -7,5 +7,4 @@ import com.walcron.lego.roller.impl.MotorImpl
 
 class LegoLargeMotorB extends MotorImpl with LegoMotor {
   val motor = new EV3LargeRegulatedMotor(MotorPort.D)
-  motor.setSpeed(800)
 }

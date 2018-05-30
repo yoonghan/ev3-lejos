@@ -10,4 +10,5 @@ trait LegoMotorImpl {
 	def legoWaitCompletion()
 	def legoClose()
   def legoGetMotor():RegulatedMotor
+  def legoSetSpeed(speed:Int)
 }

@@ -27,6 +27,10 @@ trait LegoMotor extends LegoMotorImpl {
 	  motor.waitComplete()
 	}
 	
+	def legoSetSpeed(speed:Int) {
+	  motor.setSpeed(speed)
+	}
+	
 	def legoClose() {
 	  motor.close()
 	}

@@ -15,12 +15,13 @@ import com.walcron.lego.roller.hardware.TouchSensor1
 import akka.actor.Props
 import com.walcron.lego.roller.impl.TouchSensorImpl
 
-class ScalaRoverRoller(leftMotor:MotorImpl, rightMotor:MotorImpl, touchSensor: TouchSensorImpl, activateBtn:Boolean) {  
+class ScalaRoverRoller(leftMotor:MotorImpl, rightMotor:MotorImpl, rotorMotor:MotorImpl, touchSensor: TouchSensorImpl, activateBtn:Boolean) {  
   import com.walcron.lego.roller.pgm.ThreadedRoverRoller
   
   def shutdown(){
 		leftMotor.close()
 		rightMotor.close()
+		rotorMotor.close()
 		touchSensor.close()
 		system.shutdown()
   }
@@ -32,7 +33,7 @@ class ScalaRoverRoller(leftMotor:MotorImpl, rightMotor:MotorImpl, touchSensor: T
   }
   
 	//Starter
-  val motorController = new MotorMovementController(leftMotor, rightMotor)
+  val motorController = new MotorMovementController(leftMotor, rightMotor, rotorMotor)
   val system: ActorSystem = ActorSystem("legoRoller")
   val props = ThreadedRoverRoller.props(activateBtn, motorController, touchSensor)
   val controller: ActorRef = system.actorOf(props, "threadeRoverRoller")

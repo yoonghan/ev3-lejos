@@ -5,16 +5,20 @@ import com.walcron.lego.roller.impl.MotorImpl
 import com.walcron.lego.roller.util.Const.Directions
 import com.walcron.lego.roller.util.Const
 
-class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
+class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl, rotorMotor:MotorImpl) {
   val canUpdate = new AtomicBoolean(true);
-  val fullRotation = 720
-  val halfRotation = 360
+  val fullRotation = 760
+  val halfRotation = fullRotation / 2
+  val quarterRotation = halfRotation / 2
+  val fullSpeed = 400
+  val halfSpeed = fullSpeed / 2
   
   def init() {
-   if(leftMotor != null && rightMotor !=null) {
-     val motor = rightMotor.getMotor()
-     if(motor.isDefined) {
-       leftMotor.synchronizeWith(Array(motor.get))
+   if(leftMotor != null && rightMotor !=null && rotorMotor != null) {
+     val _rightMotor = rightMotor.getMotor()
+     val _rotorMotor = rotorMotor.getMotor()
+     if(_rightMotor.isDefined && _rotorMotor.isDefined) {
+       leftMotor.synchronizeWith(Array(_rightMotor.get, _rotorMotor.get))
      }
    }
   }
@@ -23,11 +27,11 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 	 * Atomic method to stop new request going in.
 	 */
 	def move(direction:Directions) {
-		val status = canUpdate.getAndSet(false);
-		if(status) {
+//		val status = canUpdate.getAndSet(false);
+//		if(status) {
 			moveInDirection(direction)
-			canUpdate.getAndSet(true)
-		}
+//			canUpdate.getAndSet(true)
+//		}
 	}
 	
 	def moveInDirection(direction: Directions) {
@@ -50,30 +54,44 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl) {
 	
 	def moveBackward() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(-halfRotation);
-		rightMotor.rotate(-halfRotation);
+	  leftMotor.setSpeed(fullSpeed)
+		rightMotor.setSpeed(fullSpeed)
+		leftMotor.rotate(-halfRotation)
+		rightMotor.rotate(-halfRotation)
 		leftMotor.endSynchronize()
 	}
 	
 	def moveForward() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(fullRotation);
-		rightMotor.rotate(fullRotation);
+		leftMotor.setSpeed(fullSpeed)
+		rightMotor.setSpeed(fullSpeed)
+		leftMotor.rotate(fullRotation)
+		rightMotor.rotate(fullRotation)
 		leftMotor.endSynchronize()
 	}
 	
 	def moveLeft() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(-fullRotation);
-		rightMotor.rotate(fullRotation);
+	  rotorMotor.rotate(-45)
+	  leftMotor.setSpeed(halfSpeed)
+		rightMotor.setSpeed(fullSpeed)
+		leftMotor.rotate(quarterRotation)
+		rightMotor.rotate(halfRotation)
 		leftMotor.endSynchronize()
+		leftMotor.waitCompletion()
+		rotorMotor.rotate(45)
 	}
 	
 	def moveRight() {
 	  leftMotor.startSynchronize()
-		leftMotor.rotate(fullRotation);
-		rightMotor.rotate(-fullRotation);
+	  rotorMotor.rotate(45)
+	  leftMotor.setSpeed(fullSpeed)
+		rightMotor.setSpeed(halfSpeed)
+		leftMotor.rotate(halfRotation)
+		rightMotor.rotate(quarterRotation)
 		leftMotor.endSynchronize()
+		leftMotor.waitCompletion()
+		rotorMotor.rotate(-45)
 	}
 	
 	//starter

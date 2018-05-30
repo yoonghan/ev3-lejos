@@ -30,6 +30,10 @@ trait MotorImpl {this:LegoMotorImpl =>
 	  legoWaitCompletion()
 	}
 	
+	def setSpeed(speed:Int) {
+	  legoSetSpeed(speed)
+	}
+	
 	def close() {
 	  legoClose()
 	}
