@@ -47,5 +47,35 @@ services:
         delay: 20s
         max_attempts: 3
         window: 120s
+  lego-service-1:
+    image: 192.168.1.244:5000/roller-mac
+    ports:
+      - "9001:9000"
+      - "9096:9095"
+    environment:
+      - DB_HOST_IP=lego-db
+      - APPLICATION_NAME=application
+      - BIND_IP=0.0.0.0
+      - BIND_PORT=2551
+      - KAFKA_HOST_IP_AND_PORT=192.168.1.244:9092
+      - FIRST_HOST_IP=lego-service
+      - FIRST_HOST_PORT=2551
+      - SECOND_HOST_IP=lego-service-1
+      - SECOND_HOST_PORT=2551
+      - HOST_IP=lego-service-1
+      - HOST_PORT=2551
+    networks:
+      - lego_network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 20s
+        max_attempts: 3
+        window: 120s
 networks:
   lego_network:

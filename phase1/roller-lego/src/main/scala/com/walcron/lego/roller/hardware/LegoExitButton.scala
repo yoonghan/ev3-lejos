@@ -21,7 +21,6 @@ class LegoExitButton(stopFunc:()=>Unit) extends Thread {
   }
   
   override def run() {
-    println("WAIT")
     button.waitForPress()
     println("PRESS")
   }
