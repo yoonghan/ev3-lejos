@@ -27,11 +27,11 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl, rotorM
 	 * Atomic method to stop new request going in.
 	 */
 	def move(direction:Directions) {
-//		val status = canUpdate.getAndSet(false);
-//		if(status) {
+		val status = canUpdate.getAndSet(false);
+		if(status) {
 			moveInDirection(direction)
-//			canUpdate.getAndSet(true)
-//		}
+			canUpdate.getAndSet(true)
+		}
 	}
 	
 	def moveInDirection(direction: Directions) {
@@ -48,8 +48,6 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl, rotorM
 	def haltMovement() {
 	  leftMotor.rotate(0);
 		rightMotor.rotate(0);
-		leftMotor.waitCompletion();
-		rightMotor.waitCompletion();
 	}
 	
 	def moveBackward() {
@@ -59,6 +57,7 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl, rotorM
 		leftMotor.rotate(-halfRotation)
 		rightMotor.rotate(-halfRotation)
 		leftMotor.endSynchronize()
+		leftMotor.waitCompletion()
 	}
 	
 	def moveForward() {
@@ -68,6 +67,7 @@ class MotorMovementController(leftMotor: MotorImpl, rightMotor:MotorImpl, rotorM
 		leftMotor.rotate(fullRotation)
 		rightMotor.rotate(fullRotation)
 		leftMotor.endSynchronize()
+		leftMotor.waitCompletion()
 	}
 	
 	def moveLeft() {

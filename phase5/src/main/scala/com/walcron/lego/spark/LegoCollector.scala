@@ -19,7 +19,7 @@ object LegoCollector{
     val df = spark
               .readStream
               .format("kafka")
-              .option("kafka.bootstrap.servers", "localhost:9092")
+              .option("kafka.bootstrap.servers", "192.168.1.244:9092")
               .option("subscribe", "rollerTopic")
               .load()
 

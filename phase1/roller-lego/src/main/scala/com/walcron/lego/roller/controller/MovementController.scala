@@ -23,7 +23,6 @@ class MovementController(threadedMotorControllerActor: ActorRef) extends WebSock
   }
   
   override def onError(websocket:WebSocket, error:WebSocketException) {
-    println("Reconnect SQL.")
     websocket.disconnect()
     threadedMotorControllerActor ! Reconnect
     super.onError(websocket, error)

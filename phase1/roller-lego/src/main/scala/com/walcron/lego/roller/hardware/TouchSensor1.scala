@@ -17,7 +17,7 @@ class TouchSensor1 extends TouchSensorImpl {
         if(sample(0) == 1) {
           loop = false
         }
-        Thread.sleep(200)
+        Thread.sleep(500)
       }
   }
   
