@@ -10,3 +10,12 @@ Look into each folders for more info
 * Phase 4 - Scripts to execute all the needed commands
 
 If there are more details needed, please visit [Walcron](https://www.walcron.com), email contact is there.
+
+## Notes
+1) Only got this working with Eclipse (don't waste time getting intelliJ to work)
+2) Once Computer is Paired with EV3, there is still a need to get PAN working. In windows: 
+  a) Control Panel\Network and Internet\Network Connections
+  b) Click on Bluetooth Network Connection.
+  c) Open View Bluetooth network devices either by right-click on view on top.
+  d) Wait until EV3 appears.
+  e) Click on EV3 and connect.
