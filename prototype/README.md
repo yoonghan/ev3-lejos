@@ -1,5 +1,5 @@
 # Prototypes
-To test lejos capabilities as well as TCP connections
+To test lejos capabilities using bluetooth
 
 ## Prerequisite
 1. Setup Lejos in Lego Brick
